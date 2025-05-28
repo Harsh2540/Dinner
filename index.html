@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What to Cook Today?</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff7043" />
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #fff8f2;
+      margin: 0;
+    }
+    .container {
+      text-align: center;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #e65100;
+    }
+    #dish {
+      font-size: 24px;
+      color: #4e342e;
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      border: none;
+      background: #ff7043;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>What's for Dinner?</h1>
+    <p id="dish">Tap below to get today’s dish!</p>
+    <button onclick="suggestDish()">Suggest Dish</button>
+  </div>
+
+  <script>
+    const dishes = [
+      "Aloo Paratha",
+      "Rajma Chawal",
+      "Paneer Butter Masala",
+      "Dal Tadka & Rice",
+      "Chole Bhature",
+      "Pasta",
+      "Veg Pulao",
+      "Idli Sambhar",
+      "Biryani",
+      "Kadhi Chawal"
+    ];
+
+    function suggestDish() {
+      const random = dishes[Math.floor(Math.random() * dishes.length)];
+      document.getElementById('dish').innerText = `Today you can make: ${random}`;
+    }
+
+    if ('Notification' in window && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            scheduleNotification();
+          }
+        });
+      });
+    }
+
+    function scheduleNotification() {
+      const now = new Date();
+      const delay =
+        new Date().setHours(17, 0, 0, 0) - now.getTime(); // 5 PM today
+
+      const timeout = delay > 0 ? delay : 24 * 60 * 60 * 1000 + delay; // next 5 PM
+
+      setTimeout(() => {
+        const random = dishes[Math.floor(Math.random() * dishes.length)];
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification('Dinner Suggestion', {
+            body: `Today you can make: ${random}`,
+            icon: 'icon-192.png',
+            tag: 'daily-suggestion'
+          });
+        });
+        setInterval(scheduleNotification, 24 * 60 * 60 * 1000);
+      }, timeout);
+    }
+  </script>
+</body>
+</html>
