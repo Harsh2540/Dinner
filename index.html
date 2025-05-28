@@ -81,7 +81,7 @@
     function scheduleNotification() {
       const now = new Date();
       const delay =
-        new Date().setHours(17, 0, 0, 0) - now.getTime(); // 5 PM today
+        new Date().setHours(16, 45, 0, 0) - now.getTime(); // 5 PM today
 
       const timeout = delay > 0 ? delay : 24 * 60 * 60 * 1000 + delay; // next 5 PM
 
